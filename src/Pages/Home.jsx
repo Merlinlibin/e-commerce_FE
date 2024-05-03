@@ -160,7 +160,7 @@ function Home() {
           {/* Collection List */}
           <div class="container mt-5 mb-5">
             <div className="row">
-              {products ? (
+              {products.length > 0 ? (
                 products?.map((product) => (
                   <ProductCard key={product?._id} product={product} />
                 ))
