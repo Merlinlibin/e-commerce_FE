@@ -1,0 +1,23 @@
+header {
+  background-color: #ffffff;
+}
+.pass {
+  position: relative;
+}
+.eye {
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  cursor: pointer;
+}
+.heading,.username, .password{
+    color: #DC3545;
+}
+.login{
+  height: 70vh;
+}
+.btn-danger{
+  width: 100px;
+  display: grid;
+  place-items: center;
+}
