@@ -14,8 +14,10 @@ function SingleProduct() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { products, singleProd } = useSelector((state) => state.data);
-  const { user, cartCount } = useSelector((state) => state.account);
-  const { getUser, getData ,API_URI} = useGlobalContext();
+  const { user, isAuthenticated, cartCount } = useSelector(
+    (state) => state.account
+  );
+  const { getUser, getData, API_URI } = useGlobalContext();
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const navigate = useNavigate();
@@ -37,30 +39,34 @@ function SingleProduct() {
   }
 
   async function addToCart() {
-    const token = JSON.parse(localStorage.getItem("token"));
+    if (isAuthenticated) {
+      const token = JSON.parse(localStorage.getItem("token"));
 
-    if (token) {
-      try {
-        const { data } = await axios.post(
-          `${API_URI}/api/auth/addTocart`,
-          {
-            product: singleProd,
-            quantity: +qty,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
+      if (token) {
+        try {
+          const { data } = await axios.post(
+            `${API_URI}/api/auth/addTocart`,
+            {
+              product: singleProd,
+              quantity: +qty,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          if (data.success) {
+            dispatch(addToCartSuccess(parseInt(cartCount) + +qty));
+
+            toast.success(data.message);
+          } else {
+            toast.error(data.message);
           }
-        );
-        if (data.success) {
-          dispatch(addToCartSuccess(parseInt(cartCount) + +qty));
-
-          toast.success(data.message);
-        } else {
-          toast.error(data.message);
+        } catch (error) {
+          console.error("Error adding to cart:", error.response.data);
         }
-      } catch (error) {
-        console.error("Error adding to cart:", error.response.data);
       }
+    } else {
+      navigate("/login");
     }
   }
 
@@ -136,7 +142,7 @@ function SingleProduct() {
                     border: "1px solid #2874F0",
                     borderRadius: "50%",
                   }}
-                onClick={()=>setQty(qty+1)}>
+                  onClick={() => setQty(qty + 1)}>
                   +
                 </button>
                 <input
@@ -161,7 +167,7 @@ function SingleProduct() {
                     border: "1px solid #2874F0",
                     borderRadius: "50%",
                   }}
-                  onClick={() => setQty(qty -1)}>
+                  onClick={() => setQty(qty - 1)}>
                   -
                 </button>
               </div>
@@ -194,7 +200,7 @@ function SingleProduct() {
                   }}
                   onClick={() => {
                     addToCart();
-                    navigate("/checkout");
+                    isAuthenticated && navigate("/checkout");
                   }}>
                   <IoBagHandle />
                   Buy Now
